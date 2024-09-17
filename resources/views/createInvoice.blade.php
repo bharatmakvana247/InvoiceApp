@@ -76,7 +76,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-
     <script>
         $(document).ready(function() {
             // Add new product row within the same card
@@ -219,36 +218,45 @@
                 };
 
                 $.ajax({
-                    url: '{{ route('invoice.store') }}',
+                    url: '{{ route('invoice.store') }}', // Backend route
                     method: 'POST',
                     data: formData,
                     headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token
                     },
                     success: function(response) {
                         console.log("Response: ", response);
                         $('#invoice-form')[0].reset(); // Reset form
                     },
-                    error: function(response) {
+                    error: function(xhr) {
                         if (xhr.status === 422) {
                             const errors = xhr.responseJSON.errors;
-                            for (const key in errors) {
-                                if (errors.hasOwnProperty(key)) {
-                                    let errorMessages = errors[key];
-                                    let inputField = $(`[name="${key}"]`);
-                                    inputField.addClass('is-invalid');
-                                    inputField.after(
-                                        `<div class="invalid-feedback">${errorMessages.join(', ')}</div>`
-                                    );
-                                }
-                            }
+                            console.log("errors ", errors);
+
+                            displayValidationErrors(errors);
                         } else {
                             alert('Error occurred. Please try again.');
                         }
-                        // alert('Error occurred. Please try again.');
                     }
                 });
             });
+
+            // Function to display validation errors
+            function displayValidationErrors(errors) {
+                for (const key in errors) {
+                    if (errors.hasOwnProperty(key)) {
+                        let errorMessages = errors[key];
+
+                        // Handle dot notation in keys (for array items like products)
+                        let formattedKey = key.replace(/\./g, '][').replace('products', 'product_name');
+
+                        // Find the input field by name and display error
+                        let inputField = $(`[name="${formattedKey}"]`);
+                        inputField.addClass('is-invalid');
+                        inputField.after(`<div class="invalid-feedback">${errorMessages.join(', ')}</div>`);
+                    }
+                }
+            }
         });
     </script>
 

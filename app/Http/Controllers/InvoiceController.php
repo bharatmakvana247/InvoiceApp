@@ -35,17 +35,6 @@ class InvoiceController extends Controller
         return response()->json(['success' => 'Invoice and products saved successfully.']);
     }
 
-    public function checkEmail(Request $request)
-    {
-        $emailExists = Invoice::where('customer_email', $request->email)->exists();
-
-        if ($emailExists) {
-            return response()->json(['exists' => true], 200);
-        } else {
-            return response()->json(['exists' => false], 200);
-        }
-    }
-
     public function editInvoice(Request $request){
         dd("Edit Invoice");
     }

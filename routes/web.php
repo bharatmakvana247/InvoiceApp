@@ -20,6 +20,5 @@ Route::get('/', function () {
 
 Route::post('/store-invoice', [InvoiceController::class, 'storeInvoice'])->name('invoice.store');
 Route::post('/edit-invoice', [InvoiceController::class, 'editInvoice'])->name('invoice.edit');
-Route::post('/check-email', [InvoiceController::class, 'checkEmail'])->name('invoice.checkEmail');
 
 
