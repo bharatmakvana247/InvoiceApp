@@ -12,7 +12,10 @@
 
 <body>
     <div class="container mt-5">
-        <center><h2>Invoice Form</h2></center><br>
+        <center>
+            <h2>Invoice Form</h2>
+        </center>
+        <br>
         <form id="invoice-form">
             <!-- Customer Information -->
             <div class="form-group">
@@ -24,6 +27,7 @@
                 <label for="customer_email">Customer Email</label>
                 <input type="email" class="form-control" id="customer_email" name="customer_email"
                     placeholder="Customer Email">
+                <div id="error-messages" style="color: red"></div>
             </div>
 
             <!-- Product Information Section -->
@@ -55,8 +59,15 @@
                 </div>
                 <button type="button" id="add-product" class="btn btn-secondary mt-3">Add Product</button>
             </div>
-
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <center>
+                <a href="" class="btn btn-success">Total Items</a>
+                <a href="" class="btn btn-success">Total Amounts</a>
+                <a href="" class="btn btn-success">Total Discount Amounts</a>
+                <a href="" class="btn btn-success">Total Bill</a>
+            </center>
+            <center>
+                <button type="submit" class="btn btn-primary mt-2">Submit</button>
+            </center>
         </form>
     </div>
 
@@ -65,7 +76,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <!-- Custom JavaScript for dynamic product addition and AJAX submission -->
+
     <script>
         $(document).ready(function() {
             // Add new product row within the same card
@@ -99,13 +110,93 @@
                 $(this).closest('.product-item').remove();
             });
 
-            // AJAX form submission
+            // Basic email validation
+            function validateEmail(email) {
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return regex.test(email);
+            }
+
             $('#invoice-form').on('submit', function(e) {
                 e.preventDefault();
 
-                // Collect customer details
+                // Clear previous error messages
+                $('.is-invalid').removeClass('is-invalid');
+                $('.invalid-feedback').remove();
+
+                // Basic validation flags
+                let isValid = true;
+
+                // Validate customer name
                 let customerName = $('#customer_name').val();
+                if (customerName.trim() === '') {
+                    isValid = false;
+                    $('#customer_name').addClass('is-invalid');
+                    $('#customer_name').after(
+                        '<div class="invalid-feedback">Customer Name is required.</div>'
+                    );
+                }
+
+                // Validate customer email
                 let customerEmail = $('#customer_email').val();
+                if (customerEmail.trim() === '') {
+                    isValid = false;
+                    $('#customer_email').addClass('is-invalid');
+                    $('#customer_email').after(
+                        '<div class="invalid-feedback">Customer Email is required.</div>'
+                    );
+                } else if (!validateEmail(customerEmail)) {
+                    isValid = false;
+                    $('#customer_email').addClass('is-invalid');
+                    $('#customer_email').after(
+                        '<div class="invalid-feedback">Invalid Email format.</div>'
+                    );
+                }
+
+                // Validate product details
+                let hasProductErrors = false;
+                $('#product-section .product-item').each(function() {
+                    let productName = $(this).find('input[name="product_name[]"]');
+                    let productPrice = $(this).find('input[name="product_price[]"]');
+                    let productDiscount = $(this).find('input[name="product_discount[]"]');
+
+                    // Validate product name
+                    if (productName.val().trim() === '') {
+                        hasProductErrors = true;
+                        productName.addClass('is-invalid');
+                        productName.after(
+                            '<div class="invalid-feedback">Product Name is required.</div>'
+                        );
+                    }
+
+                    // Validate product price
+                    if (productPrice.val().trim() === '' || isNaN(productPrice.val()) ||
+                        productPrice.val() <= 0) {
+                        hasProductErrors = true;
+                        productPrice.addClass('is-invalid');
+                        productPrice.after(
+                            '<div class="invalid-feedback">Product Price is required and must be a positive number.</div>'
+                        );
+                    }
+
+                    // Validate product discount
+                    if (productDiscount.val().trim() === '' || isNaN(productDiscount.val()) ||
+                        productDiscount.val() < 0) {
+                        hasProductErrors = true;
+                        productDiscount.addClass('is-invalid');
+                        productDiscount.after(
+                            '<div class="invalid-feedback">Product Discount is required and must be a non-negative number.</div>'
+                        );
+                    }
+                });
+
+                if (hasProductErrors) {
+                    isValid = false;
+                }
+
+                // If form is invalid, stop the submission
+                if (!isValid) {
+                    return;
+                }
 
                 // Collect product details into an array of objects
                 let products = [];
@@ -135,17 +226,32 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        console.log("Res : ", response);
-
+                        console.log("Response: ", response);
                         $('#invoice-form')[0].reset(); // Reset form
                     },
                     error: function(response) {
-                        alert('Error occurred. Please try again.');
+                        if (xhr.status === 422) {
+                            const errors = xhr.responseJSON.errors;
+                            for (const key in errors) {
+                                if (errors.hasOwnProperty(key)) {
+                                    let errorMessages = errors[key];
+                                    let inputField = $(`[name="${key}"]`);
+                                    inputField.addClass('is-invalid');
+                                    inputField.after(
+                                        `<div class="invalid-feedback">${errorMessages.join(', ')}</div>`
+                                    );
+                                }
+                            }
+                        } else {
+                            alert('Error occurred. Please try again.');
+                        }
+                        // alert('Error occurred. Please try again.');
                     }
                 });
             });
         });
     </script>
+
 </body>
 
 </html>

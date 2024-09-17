@@ -12,16 +12,18 @@ class InvoiceController extends Controller
     {
         $request->validate([
             'customer_name' => 'required|string|max:255',
-            'customer_email' => 'required|email|unique:customers,email',
+            'customer_email' => 'required|email|unique:invoices,customer_email',
             'products' => 'required|array|min:1',
             'products.*.product_name' => 'required|string|max:255',
             'products.*.product_price' => 'required|numeric|min:0',
             'products.*.product_discount' => 'required|numeric|min:0',
         ]);
-        $invoice = Invoice::create([
+        // Inovice table invocie customer data stored 
+        $invoice = invoice::create([
             'customer_name' => $request->get('customer_name'),
             'customer_email' => $request->get('customer_email'),
         ]);
+        // Product table product data stored
         foreach ($request->products as $product) {
             $products =  product::create([
                 'invoice_id' => $invoice->id,
@@ -31,6 +33,17 @@ class InvoiceController extends Controller
             ]);
         }
         return response()->json(['success' => 'Invoice and products saved successfully.']);
+    }
+
+    public function checkEmail(Request $request)
+    {
+        $emailExists = Invoice::where('customer_email', $request->email)->exists();
+
+        if ($emailExists) {
+            return response()->json(['exists' => true], 200);
+        } else {
+            return response()->json(['exists' => false], 200);
+        }
     }
 
     public function editInvoice(Request $request){
