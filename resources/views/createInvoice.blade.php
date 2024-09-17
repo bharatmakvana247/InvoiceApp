@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Form</title>
-    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
@@ -17,7 +16,6 @@
         </center>
         <br>
         <form id="invoice-form">
-            <!-- Customer Information -->
             <div class="form-group">
                 <label for="customer_name">Customer Name</label>
                 <input type="text" class="form-control" id="customer_name" name="customer_name"
@@ -30,7 +28,6 @@
                 <div id="error-messages" style="color: red"></div>
             </div>
 
-            <!-- Product Information Section -->
             <h4>Products</h4>
             <div class="card p-3 mb-3">
                 <div id="product-section">
@@ -79,14 +76,12 @@
         </form>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         $(document).ready(function() {
-            // Add new product row within the same card
             $('#add-product').click(function() {
                 var productItem = `
                     <div class="product-item form-group">
@@ -112,12 +107,10 @@
                 $('#product-section').append(productItem);
             });
 
-            // Remove product row
             $(document).on('click', '.remove-product', function() {
                 $(this).closest('.product-item').remove();
             });
 
-            // Basic email validation
             function validateEmail(email) {
                 const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 return regex.test(email);
@@ -126,14 +119,10 @@
             $('#invoice-form').on('submit', function(e) {
                 e.preventDefault();
 
-                // Clear previous error messages
                 $('.is-invalid').removeClass('is-invalid');
                 $('.invalid-feedback').remove();
 
-                // Basic validation flags
                 let isValid = true;
-
-                // Validate customer name
                 let customerName = $('#customer_name').val();
                 if (customerName.trim() === '') {
                     isValid = false;
@@ -143,7 +132,6 @@
                     );
                 }
 
-                // Validate customer email
                 let customerEmail = $('#customer_email').val();
                 if (customerEmail.trim() === '') {
                     isValid = false;
@@ -159,14 +147,12 @@
                     );
                 }
 
-                // Validate product details
                 let hasProductErrors = false;
                 $('#product-section .product-item').each(function() {
                     let productName = $(this).find('input[name="product_name[]"]');
                     let productPrice = $(this).find('input[name="product_price[]"]');
                     let productDiscount = $(this).find('input[name="product_discount[]"]');
 
-                    // Validate product name
                     if (productName.val().trim() === '') {
                         hasProductErrors = true;
                         productName.addClass('is-invalid');
@@ -175,7 +161,6 @@
                         );
                     }
 
-                    // Validate product price
                     if (productPrice.val().trim() === '' || isNaN(productPrice.val()) ||
                         productPrice.val() <= 0) {
                         hasProductErrors = true;
@@ -185,7 +170,6 @@
                         );
                     }
 
-                    // Validate product discount
                     if (productDiscount.val().trim() === '' || isNaN(productDiscount.val()) ||
                         productDiscount.val() < 0) {
                         hasProductErrors = true;
@@ -200,12 +184,10 @@
                     isValid = false;
                 }
 
-                // If form is invalid, stop the submission
                 if (!isValid) {
                     return;
                 }
 
-                // Collect product details into an array of objects
                 let products = [];
                 $('#product-section .product-item').each(function() {
                     let productName = $(this).find('input[name="product_name[]"]').val();
@@ -226,15 +208,15 @@
                 };
 
                 $.ajax({
-                    url: '{{ route('invoice.store') }}', // Backend route
+                    url: '{{ route('invoice.store') }}', 
                     method: 'POST',
                     data: formData,
                     headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
                         console.log("Response: ", response);
-                        $('#invoice-form')[0].reset(); // Reset form
+                        $('#invoice-form')[0].reset(); 
                     },
                     error: function(xhr) {
                         if (xhr.status === 422) {
@@ -249,16 +231,11 @@
                 });
             });
 
-            // Function to display validation errors
             function displayValidationErrors(errors) {
                 for (const key in errors) {
                     if (errors.hasOwnProperty(key)) {
                         let errorMessages = errors[key];
-
-                        // Handle dot notation in keys (for array items like products)
                         let formattedKey = key.replace(/\./g, '][').replace('products', 'product_name');
-
-                        // Find the input field by name and display error
                         let inputField = $(`[name="${formattedKey}"]`);
                         inputField.addClass('is-invalid');
                         inputField.after(`<div class="invalid-feedback">${errorMessages.join(', ')}</div>`);
@@ -268,9 +245,8 @@
 
             $('#totalItems').click(function(event) {
                 event.preventDefault();
-
                 $.ajax({
-                    url: '{{ route('invoice.index') }}', // Replace with actual route for total items
+                    url: '{{ route('invoice.index') }}', 
                     method: 'GET',
                     success: function(data) {
                         console.log("data :",data);
@@ -283,13 +259,10 @@
                 });
             });
 
-            // Handle Total Amount Click
             $('#totalAmount').click(function(event) {
                 event.preventDefault();
-
                 $.ajax({
-                    
-                    url: '{{ route('invoice.totalAmount') }}', // Replace with actual route for total items
+                    url: '{{ route('invoice.totalAmount') }}', 
                     method: 'GET',
                     success: function(data) {
                         $('#totalAmountCount').text('Total Amount: ₹' + data.totalAmount);
@@ -300,15 +273,12 @@
                 });
             });
 
-            // Handle Total Discount Click
             $('#totalDiscount').click(function(event) {
                 event.preventDefault();
-
                 $.ajax({
-                    url: '{{ route('invoice.totalDiscount') }}', // Replace with actual route for total items
+                    url: '{{ route('invoice.totalDiscount') }}', 
                     method: 'GET',
                     success: function(data) {
-                        // Update the h4 tag with the total discount amount
                         $('#totalDiscountCount').text('Total Discount: ₹' + data.totalDisc);
                     },
                     error: function(error) {
@@ -317,15 +287,12 @@
                 });
             });
 
-            // Handle Total Bill Click
             $('#totalBill').click(function(event) {
                 event.preventDefault();
-
                 $.ajax({
-                    url: '{{ route('invoice.totalBill') }}', // Replace with actual route for total items
+                    url: '{{ route('invoice.totalBill') }}', 
                     method: 'GET',
                     success: function(data) {
-                        // Update the h4 tag with the total bill
                         $('#totalBillCount').text('Total Bill: ₹' + data.totalBill);
                     },
                     error: function(error) {
