@@ -30,8 +30,15 @@ You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you
 If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
 ## Invoice App
+This Invoice app is built using Laravel, AJAX, Bootstrap, and jQuery.
 
-I has created Invoice app created in laravel , ajax, bootstarp, jqueery bases created
-
-in invoice app have first migration like php artisan migrate to migrate the database
-then comp
+Features
+- Bootstrap UI: Utilizes Bootstrap for a responsive and modern user interface.
+- AJAX Integration: Minimizes page reloads and improves user experience with AJAX functionality.
+- Database Migration: Run php artisan migrate to set up the database schema.
+- Validation: Includes form validation on both the client and server sides.
+- Unique Email Validation: Ensures unique email addresses.
+- Product Management: Allows for adding multiple products with validation for each product.
+- Database Relations: Products and invoices are saved with proper database relationships.
+- Product Count and Pricing: Displays the total count of products and calculates the total price dynamically.
+- Discounts: Displays applicable discounts and updates the total accordingly.
