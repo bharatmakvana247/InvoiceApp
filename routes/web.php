@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('createInvoice');
 });
+
+Route::post('/store-invoice', [InvoiceController::class, 'storeInvoice'])->name('invoice.store');
+Route::post('/edit-invoice', [InvoiceController::class, 'editInvoice'])->name('invoice.edit');
+
