@@ -60,10 +60,18 @@
                 <button type="button" id="add-product" class="btn btn-secondary mt-3">Add Product</button>
             </div>
             <center>
-                <a href="" class="btn btn-success">Total Items</a>
-                <a href="" class="btn btn-success">Total Amounts</a>
-                <a href="" class="btn btn-success">Total Discount Amounts</a>
-                <a href="" class="btn btn-success">Total Bill</a>
+                <a href="#" id="totalItems" class="btn btn-success">Total Items</a>
+                <h4 id="totalItemsCount"></h4>
+
+                <a href="#" id="totalAmount" class="btn btn-success">Total Amounts</a>
+                <h4 id="totalAmountCount"></h4>
+
+                <a href="#" id="totalDiscount" class="btn btn-success">Total Discount Amounts</a>
+                <h4 id="totalDiscountCount"></h4>
+
+                <a href="#" id="totalBill" class="btn btn-success">Total Bill</a>
+                <h4 id="totalBillCount"></h4>
+
             </center>
             <center>
                 <button type="submit" class="btn btn-primary mt-2">Submit</button>
@@ -257,6 +265,75 @@
                     }
                 }
             }
+
+            $('#totalItems').click(function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    url: '{{ route('invoice.index') }}', // Replace with actual route for total items
+                    method: 'GET',
+                    success: function(data) {
+                        console.log("data :",data);
+                        
+                        $('#totalItemsCount').text('Total Items: ' + data.totalItems);
+                    },
+                    error: function(error) {
+                        console.error('Error fetching total items:', error);
+                    }
+                });
+            });
+
+            // Handle Total Amount Click
+            $('#totalAmount').click(function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    
+                    url: '{{ route('invoice.totalAmount') }}', // Replace with actual route for total items
+                    method: 'GET',
+                    success: function(data) {
+                        $('#totalAmountCount').text('Total Amount: ₹' + data.totalAmount);
+                    },
+                    error: function(error) {
+                        console.error('Error fetching total amount:', error);
+                    }
+                });
+            });
+
+            // Handle Total Discount Click
+            $('#totalDiscount').click(function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    url: '{{ route('invoice.totalDiscount') }}', // Replace with actual route for total items
+                    method: 'GET',
+                    success: function(data) {
+                        // Update the h4 tag with the total discount amount
+                        $('#totalDiscountCount').text('Total Discount: ₹' + data.totalDisc);
+                    },
+                    error: function(error) {
+                        console.error('Error fetching total discount:', error);
+                    }
+                });
+            });
+
+            // Handle Total Bill Click
+            $('#totalBill').click(function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    url: '{{ route('invoice.totalBill') }}', // Replace with actual route for total items
+                    method: 'GET',
+                    success: function(data) {
+                        // Update the h4 tag with the total bill
+                        $('#totalBillCount').text('Total Bill: ₹' + data.totalBill);
+                    },
+                    error: function(error) {
+                        console.error('Error fetching total bill:', error);
+                    }
+                });
+            });
+
         });
     </script>
 

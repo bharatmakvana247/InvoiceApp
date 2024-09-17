@@ -35,7 +35,25 @@ class InvoiceController extends Controller
         return response()->json(['success' => 'Invoice and products saved successfully.']);
     }
 
-    public function editInvoice(Request $request){
-        dd("Edit Invoice");
+    public function indexInvoice(Request $request)
+    {
+        $totalItems = Product::count(); // Count of all products
+        return response()->json(['success' => 'products data get successfully.','totalItems' => $totalItems]);
+    }
+    public function totalAmount(Request $request)
+    {
+        $totalAmount = Product::sum('product_price'); // Sum of the 'amount' column
+        // dd("totalAmount",$totalAmount);
+        return response()->json(['success' => 'products data get successfully.','totalAmount' => $totalAmount]);
+    }
+    public function totalDiscount(Request $request)
+    {
+        $totalDisc = Product::sum('product_discount'); // Count of all products
+        return response()->json(['success' => 'products data get successfully.','totalDisc' => $totalDisc]);
+    }
+    public function totalBill(Request $request)
+    {
+        $totalBill = Product::count('product_price'); // Count of all products
+        return response()->json(['success' => 'products data get successfully.','totalBill' => $totalBill]);
     }
 }
